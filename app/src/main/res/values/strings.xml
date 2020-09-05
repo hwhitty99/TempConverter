@@ -4,4 +4,5 @@
     <string name="fahrenheit">Fahrenheit</string>
     <string name="degrees">Degrees</string>
     <string name="celcius">Celcius</string>
+    <string name="celciusDefault">0.0</string>
 </resources>

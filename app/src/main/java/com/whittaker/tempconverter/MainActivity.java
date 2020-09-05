@@ -1,32 +1,33 @@
 package com.whittaker.tempconverter;
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.view.View,OnClickListener;
+import android.widget.TextView.OnEditorActionListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-public class MainActivity extends AppCompatActivity
-implements TextView.OnEditorActionListener, View.OnClickListener {
+public class MainActivity extends Activity
+        implements OnEditorActionListener {
 
-    private EditText fahrEditText;
-    private TextView celciusTextView;
-
+    private EditText fahrenheitEditText;
+    private TextView celsiusTextView;
     private SharedPreferences savedValues;
-
-    private String fahrString = "";
+    private String fahrenheitString = "";
+    private String celsiusString = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fahrEditText = (EditText) findViewById(R.id.fNum);
-        celciusTextView = (TextView) findViewById(R.id.cNum);
+        fahrenheitEditText = (EditText) findViewById(R.id.fNum);
+        celsiusTextView = (TextView) findViewById(R.id.cNum);
 
-        fahrEditText.setOnEditorActionListener(this);
+        fahrenheitEditText.setOnEditorActionListener(this);
 
         savedValues = getSharedPreferences("SavedValues", MODE_PRIVATE);
     }
@@ -35,7 +36,8 @@ implements TextView.OnEditorActionListener, View.OnClickListener {
     public void onPause() {
         // save the instance variables
         Editor editor = savedValues.edit();
-        editor.putString("fahrString", fahrString);
+        editor.putString("fahrenheitString", fahrenheitString);
+        editor.putString("celsiusString", celsiusString);
         editor.apply();
 
         super.onPause();
@@ -46,40 +48,42 @@ implements TextView.OnEditorActionListener, View.OnClickListener {
         super.onResume();
 
         // get the instance variables
-        fahrString = savedValues.getString("fahrString", "");
+        fahrenheitString = savedValues.getString("fahrenheitString", "");
+        celsiusString = savedValues.getString("celsiusString", String.valueOf(0.0f));
 
-        // set the bill amount on its widget
-        fahrEditText.setText(fahrString);
+        // set the fahrenheit degrees on its widget
+        fahrenheitEditText.setText(fahrenheitString);
 
         // calculate and display
-        fahrToCelcius();
+        fahrToCelsius();
     }
 
 
-    public void fahrToCelcius() {
-        String fahrString = fahrEditText.getText().toString();
-        float fahrFloat, celciusFloat;
+    public void fahrToCelsius() {
+        fahrenheitString = fahrenheitEditText.getText().toString();
+        float fahrFloat;
+        float celsiusFloat;
 
-        if (fahrString.equals("")) {
+        if (fahrenheitString.equals("")) {
             fahrFloat = 0;
         } else {
-            fahrFloat = Float.parseFloat(fahrString);
+            fahrFloat = Float.parseFloat(fahrenheitString);
         }
 
-        //calculate Fahrenheint to Celcius
-        celciusFloat = (fahrFloat - 32) * 5/9;
+        //calculate Fahrenheit to Celsius
+        celsiusFloat = (fahrFloat - 32) * 5/9;
+        celsiusString = Float.toString(celsiusFloat);
 
-        //display Celcius
-        celciusTextView.setText((int) celciusFloat);
+        //display Celsius
+        celsiusTextView.setText(celsiusString);
     }
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         if (actionId == EditorInfo.IME_ACTION_DONE ||
                 actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-            fahrToCelcius();
+            fahrToCelsius();
         }
         return false;
     }
-
 }
